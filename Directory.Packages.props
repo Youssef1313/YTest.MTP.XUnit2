@@ -1,0 +1,10 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Testing.Platform" Version="2.0.2" />
+  </ItemGroup>
+</Project>

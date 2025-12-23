@@ -1,0 +1,8 @@
+﻿<Project>
+  <PropertyGroup>
+    <IsTestingPlatformApplication>true</IsTestingPlatformApplication>
+  </PropertyGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+</Project>

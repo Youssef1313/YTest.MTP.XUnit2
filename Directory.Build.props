@@ -1,0 +1,35 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <DebugType>embedded</DebugType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
+
+    <!-- By default, NuGet doesn't include portable PDBs in nupkg. -->
+    <!-- As I'm not producing a separate symbol package (*.snupkg), I want portable PDBs to be included. -->
+    <!-- For more information about symbol packages, see https://learn.microsoft.com/en-us/nuget/create-packages/symbol-packages-snupkg -->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <Version>1.0.0-beta.3</Version>
+    <Authors>Youssef1313</Authors>
+    <PackageTags>Pipe NamedPipe Protocol IPC Communication</PackageTags>
+    <Description>
+      This package provides MTP support for xunit 2.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <GlobalPackageReference Include="PolySharp" Version="1.15.0" />
+  </ItemGroup>
+</Project>
