@@ -1,4 +1,6 @@
-﻿<Project Sdk="MSTest.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\src\YTest.MTP.XUnit2\build\YTest.MTP.XUnit2.props" />
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,7 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\YTest.MTP.XUnit2\YTest.MTP.XUnit2.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\YTest.MTP.XUnit2\YTest.MTP.XUnit2.csproj" />
+    <PackageReference Include="xunit" />
   </ItemGroup>
 
 </Project>

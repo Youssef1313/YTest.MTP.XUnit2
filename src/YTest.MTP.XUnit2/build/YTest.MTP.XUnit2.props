@@ -4,5 +4,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <TestingPlatformBuilderHook Include="8B24EA48-6E01-4106-AE13-FA89B515A23C">
+      <DisplayName>XUnit 2 Microsoft.Testing.Platform</DisplayName>
+      <TypeFullName>YTest.MTP.XUnit2.TestingPlatformBuilderHook</TypeFullName>
+    </TestingPlatformBuilderHook>
   </ItemGroup>
 </Project>
