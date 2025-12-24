@@ -9,8 +9,8 @@ public class SimpleTestClass
     {
     }
 
-    [Fact]
-    public void FailingTest()
+    [Fact(Skip = "Skipped becase...")]
+    public void SkippedTet()
     {
         Assert.Fail("Failing test...");
     }
