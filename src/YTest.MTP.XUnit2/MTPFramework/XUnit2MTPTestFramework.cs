@@ -140,14 +140,17 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
                 typeFQNWithoutNamespace = typeFQN.Substring(lastIndexOfDot + 1);
             }
 
-            // TODO: Parameter types - https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
+            // TODO: This might not be correct for generics: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
+            // However, even core MTP didn't yet standardize on how to represent generics in TestMethodIdentifierProperty.
+            // Should it be using the "!<index>" and "!!<index>" similar to VSTest's ManagedMethod (but without the escaping rules)?
+            var parameters = test.TestMethod.Method.GetParameters().Select(p => p.ParameterType.Name);
             testNode.Properties.Add(new TestMethodIdentifierProperty(
                 assemblyFullName: test.TestMethod.TestClass.TestCollection.TestAssembly.Assembly.Name,
                 @namespace: @namespace,
                 typeName: typeFQNWithoutNamespace,
                 methodName: test.TestMethod.Method.Name,
                 methodArity: test.TestMethod.Method.GetGenericArguments().Count(),
-                parameterTypeFullNames: [],
+                parameterTypeFullNames: [..parameters],
                 returnTypeFullName: test.TestMethod.Method.ReturnType.Name));
 
             if (!string.IsNullOrEmpty(test.SourceInformation.FileName))
