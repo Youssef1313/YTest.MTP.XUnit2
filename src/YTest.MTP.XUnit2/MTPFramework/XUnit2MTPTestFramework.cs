@@ -103,9 +103,8 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         TestCaseFilterExpression? filter)
     {
         var configuration = GetConfiguration(assemblyPath);
-        
-        using var frontController = GetFrontController(assemblyPath, configuration);
-
+        var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration);
+        using var frontController = GetFrontController(assemblyPath, configuration, diagnosticMessageSink);
         var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
 
         foreach (ITestCase test in testCases)
@@ -134,7 +133,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
                 typeFQNWithoutNamespace = typeFQN.Substring(lastIndexOfDot + 1);
             }
 
-            // TODO: Parameter types.
+            // TODO: Parameter types - https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
             testNode.Properties.Add(new TestMethodIdentifierProperty(
                 assemblyFullName: test.TestMethod.TestClass.TestCollection.TestAssembly.Assembly.Name,
                 @namespace: @namespace,
@@ -176,13 +175,13 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         TestCaseFilterExpression? filter)
     {
         var configuration = GetConfiguration(assemblyPath);
-        using var frontController = GetFrontController(assemblyPath, configuration);
+        var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration);
+        using var frontController = GetFrontController(assemblyPath, configuration, diagnosticMessageSink);
         var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
 
-        var assemblyDisplayName = Path.GetFileNameWithoutExtension(assemblyPath);
         var executionSinkOptions = new ExecutionSinkOptions
         {
-            DiagnosticMessageSink = new MTPDiagnosticMessageSink(_loggerFactory, assemblyDisplayName, configuration.DiagnosticMessagesOrDefault),
+            DiagnosticMessageSink = diagnosticMessageSink,
             FailSkips = configuration.FailSkipsOrDefault,
             LongRunningTestTime = TimeSpan.FromSeconds(configuration.LongRunningTestSecondsOrDefault),
         };
@@ -192,7 +191,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
         await Task.Factory.StartNew(executionSink.Finished.WaitOne, TaskCreationOptions.LongRunning);
 
-        // TODO: SessionFileArtifact
+        // TODO: SessionFileArtifact - https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
     }
 
     private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)
@@ -257,13 +256,17 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         return configuration;
     }
 
-    private static XunitFrontController GetFrontController(string assemblyPath, TestAssemblyConfiguration configuration)
+    private static XunitFrontController GetFrontController(string assemblyPath, TestAssemblyConfiguration configuration, IMessageSink diagnosticMessageSink)
         => new XunitFrontController(
             configuration.AppDomainOrDefault,
             assemblyPath,
             configFileName: null,
             configuration.ShadowCopyOrDefault,
             shadowCopyFolder: null,
+            // TODO: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/3
             sourceInformationProvider: null,
-            diagnosticMessageSink: null);
+            diagnosticMessageSink);
+
+    private MTPDiagnosticMessageSink GetDiagnosticMessageSink(string assemblyPath, TestAssemblyConfiguration configuration)
+        => new MTPDiagnosticMessageSink(_loggerFactory, Path.GetFileNameWithoutExtension(assemblyPath), configuration.DiagnosticMessagesOrDefault);
 }

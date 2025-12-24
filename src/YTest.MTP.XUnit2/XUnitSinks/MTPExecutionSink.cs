@@ -30,7 +30,7 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
         Execution.TestCollectionCleanupFailureEvent += OnTestCollectionCleanupFailure;
         Execution.TestMethodCleanupFailureEvent += OnTestMethodCleanupFailure;
 
-        // TODO: Figure out how to report FileArtifactProperty, if attachments is a thing in xunit 2 at all.
+        // TODO: Figure out how to report FileArtifactProperty, if attachments is a thing in xunit 2 at all - https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
     }
 
     private void OnTestCaseStarting(MessageHandlerArgs<ITestCaseStarting> args)
