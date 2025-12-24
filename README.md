@@ -42,4 +42,5 @@ There are additional concerns that are general for any VSTest to MTP migration.
 
 1. If using .NET 10 SDK or later (recommended), update `global.json` to specify Microsoft.Testing.Platform as the test runner.
 1. Update any CI YML files or scripts to use the right command-line options for MTP.
+1. If you don't need VSTest support anymore, you can also remove the package references of `xunit.runner.visualstudio` and `Microsoft.NET.Test.Sdk`
 1. Enjoy running xunit 2 on Microsoft.Testing.Platform!
