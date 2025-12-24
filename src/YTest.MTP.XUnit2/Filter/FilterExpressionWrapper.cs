@@ -4,9 +4,7 @@
 // NOTE: This file is copied as-is from VSTest source code.
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 
 namespace YTest.MTP.XUnit2.Filter;
 
@@ -28,9 +26,9 @@ internal sealed class FilterExpressionWrapper
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterExpressionWrapper"/> class.
-    /// Initializes FilterExpressionWrapper with given filterString and options.
+    /// Initializes FilterExpressionWrapper with given filterString.
     /// </summary>
-    public FilterExpressionWrapper(string filterString, FilterOptions? options)
+    public FilterExpressionWrapper(string filterString)
     {
         if (string.IsNullOrEmpty(filterString))
         {
@@ -38,7 +36,6 @@ internal sealed class FilterExpressionWrapper
         }
 
         FilterString = filterString;
-        FilterOptions = options;
 
         try
         {
@@ -48,18 +45,6 @@ internal sealed class FilterExpressionWrapper
             if (UseFastFilter)
             {
                 _filterExpression = null;
-
-                // Property value regex is only supported for fast filter,
-                // so we ignore it if no fast filter is constructed.
-
-                // TODO: surface an error message to suer.
-                string? regexString = options?.FilterRegEx;
-                if (!string.IsNullOrEmpty(regexString))
-                {
-                    Debug.Assert(options!.FilterRegExReplacement == null || options.FilterRegEx != null);
-                    _fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
-                    _fastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
-                }
             }
         }
         catch (FormatException ex)
@@ -73,15 +58,6 @@ internal sealed class FilterExpressionWrapper
         }
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilterExpressionWrapper"/> class.
-    /// Initializes FilterExpressionWrapper with given filterString.
-    /// </summary>
-    public FilterExpressionWrapper(string filterString)
-        : this(filterString, null)
-    {
-    }
-
     [MemberNotNullWhen(true, nameof(_fastFilter))]
     private bool UseFastFilter => _fastFilter != null;
 
@@ -89,11 +65,6 @@ internal sealed class FilterExpressionWrapper
     /// Gets user specified filter criteria.
     /// </summary>
     public string FilterString { get; }
-
-    /// <summary>
-    /// Gets user specified additional filter options.
-    /// </summary>
-    public FilterOptions? FilterOptions { get; }
 
     /// <summary>
     /// Gets parsing error (if any), when parsing 'FilterString' with built-in parser.

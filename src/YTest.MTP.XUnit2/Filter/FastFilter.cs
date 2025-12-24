@@ -4,9 +4,7 @@
 // NOTE: This file is copied as-is from VSTest source code.
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace YTest.MTP.XUnit2.Filter;
 
@@ -31,10 +29,6 @@ internal sealed class FastFilter
     internal Dictionary<string, HashSet<string>> FilterProperties { get; }
 
     internal bool IsFilteredOutWhenMatched { get; }
-
-    internal Regex? PropertyValueRegex { get; set; }
-
-    internal string? PropertyValueRegexReplacement { get; set; }
 
     internal string[]? ValidForProperties(IEnumerable<string>? properties)
         => properties is null
@@ -61,12 +55,12 @@ internal sealed class FastFilter
 
             if (singleValue != null)
             {
-                string? value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
+                string? value = singleValue;
                 matched = value != null && FilterProperties[name].Contains(value);
             }
             else
             {
-                IEnumerable<string?>? values = PropertyValueRegex == null ? multiValues : multiValues?.Select(ApplyRegex);
+                IEnumerable<string?>? values = multiValues;
                 matched = values?.Any(result => result != null && FilterProperties[name].Contains(result)) == true;
             }
 
@@ -77,31 +71,6 @@ internal sealed class FastFilter
         }
 
         return IsFilteredOutWhenMatched ? !matched : matched;
-    }
-
-    /// <summary>
-    /// Apply regex matching or replacement to given value.
-    /// </summary>
-    /// <returns>For matching, returns the result of matching, null if no match found. For replacement, returns the result of replacement.</returns>
-    private string? ApplyRegex(string value)
-    {
-        Debug.Assert(PropertyValueRegex != null);
-
-        string? result = null;
-        if (PropertyValueRegexReplacement == null)
-        {
-            Match match = PropertyValueRegex!.Match(value);
-            if (match.Success)
-            {
-                result = match.Value;
-            }
-        }
-        else
-        {
-            result = PropertyValueRegex!.Replace(value, PropertyValueRegexReplacement);
-        }
-
-        return result;
     }
 
     /// <summary>
