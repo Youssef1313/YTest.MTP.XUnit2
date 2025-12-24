@@ -20,6 +20,6 @@ public static class TestingPlatformBuilderHook
         var trxReportCapability = new XUnit2MTPTestTrxCapability();
         testApplicationBuilder.RegisterTestFramework(
             capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability),
-            frameworkFactory: (_, sp) => new XUnit2MTPTestFramework(trxReportCapability, sp.GetCommandLineOptions(), sp.GetLoggerFactory()));
+            frameworkFactory: (_, sp) => new XUnit2MTPTestFramework(trxReportCapability, sp.GetCommandLineOptions(), sp.GetOutputDevice(), sp.GetLoggerFactory()));
     }
 }

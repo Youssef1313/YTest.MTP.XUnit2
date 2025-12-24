@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.Testing.Extensions.TrxReport.Abstractions;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
+using Microsoft.Testing.Platform.Extensions.OutputDevice;
 using Microsoft.Testing.Platform.Extensions.TestFramework;
 using Microsoft.Testing.Platform.Logging;
+using Microsoft.Testing.Platform.OutputDevice;
 using Microsoft.Testing.Platform.Requests;
 using Xunit;
 using Xunit.Abstractions;
@@ -17,20 +19,25 @@ using YTest.MTP.XUnit2.Filter;
 
 namespace YTest.MTP.XUnit2;
 
-internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extensions.TestFramework.ITestFramework, IDataProducer
+internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extensions.TestFramework.ITestFramework,
+    IDataProducer,
+    IOutputDeviceDataProducer
 {
     private readonly XUnit2MTPTestTrxCapability _trxReportCapability;
     private readonly ICommandLineOptions _commandLineOptions;
+    private readonly IOutputDevice _outputDevice;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<XUnit2MTPTestFramework> _logger;
 
     public XUnit2MTPTestFramework(
         XUnit2MTPTestTrxCapability trxReportCapability,
         ICommandLineOptions commandLineOptions,
+        IOutputDevice outputDevice,
         ILoggerFactory loggerFactory)
     {
         _trxReportCapability = trxReportCapability;
         _commandLineOptions = commandLineOptions;
+        _outputDevice = outputDevice;
         _loggerFactory = loggerFactory;
 
         _logger = loggerFactory.CreateLogger<XUnit2MTPTestFramework>();
@@ -102,8 +109,8 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         string assemblyPath,
         TestCaseFilterExpression? filter)
     {
-        var configuration = GetConfiguration(assemblyPath);
-        var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration);
+        var configuration = await GetConfigurationAsync(assemblyPath, context.CancellationToken);
+        var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration, context.CancellationToken);
         using var frontController = GetFrontController(assemblyPath, configuration, diagnosticMessageSink);
         var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
 
@@ -174,8 +181,8 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         string assemblyPath,
         TestCaseFilterExpression? filter)
     {
-        var configuration = GetConfiguration(assemblyPath);
-        var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration);
+        var configuration = await GetConfigurationAsync(assemblyPath, context.CancellationToken);
+        var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration, context.CancellationToken);
         using var frontController = GetFrontController(assemblyPath, configuration, diagnosticMessageSink);
         var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
 
@@ -237,7 +244,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         };
     }
 
-    private TestAssemblyConfiguration GetConfiguration(string assemblyPath)
+    private async Task<TestAssemblyConfiguration> GetConfigurationAsync(string assemblyPath, CancellationToken cancellationToken)
     {
         var warnings = new List<string>();
         var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings);
@@ -251,6 +258,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         foreach (var warning in warnings)
         {
             _logger.LogWarning(warning);
+            await _outputDevice.DisplayAsync(this, new WarningMessageOutputDeviceData(warning), cancellationToken);
         }
 
         return configuration;
@@ -267,6 +275,6 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             sourceInformationProvider: null,
             diagnosticMessageSink);
 
-    private MTPDiagnosticMessageSink GetDiagnosticMessageSink(string assemblyPath, TestAssemblyConfiguration configuration)
-        => new MTPDiagnosticMessageSink(_loggerFactory, Path.GetFileNameWithoutExtension(assemblyPath), configuration.DiagnosticMessagesOrDefault);
+    private MTPDiagnosticMessageSink GetDiagnosticMessageSink(string assemblyPath, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)
+        => new MTPDiagnosticMessageSink(data => _outputDevice.DisplayAsync(this, data, cancellationToken).GetAwaiter().GetResult(), _loggerFactory, Path.GetFileNameWithoutExtension(assemblyPath), configuration.DiagnosticMessagesOrDefault);
 }
