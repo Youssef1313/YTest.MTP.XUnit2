@@ -16,7 +16,6 @@ public static class TestingPlatformBuilderHook
     /// <param name="arguments">The test application cli arguments.</param>
     public static void AddExtensions(ITestApplicationBuilder testApplicationBuilder, string[] arguments)
     {
-        // TODO: Add support for VSTest's --filter.
         testApplicationBuilder.CommandLine.AddProvider(() => new XUnit2MTPCommandLineProvider());
         var trxReportCapability = new XUnit2MTPTestTrxCapability();
         testApplicationBuilder.RegisterTestFramework(
