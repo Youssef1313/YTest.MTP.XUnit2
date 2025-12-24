@@ -49,11 +49,14 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         typeof(SessionFileArtifact),
     ];
 
-    public Task<CloseTestSessionResult> CloseTestSessionAsync(CloseTestSessionContext context)
-        => Task.FromResult(new CloseTestSessionResult() { IsSuccess = true });
+    public Task<bool> IsEnabledAsync()
+        => Task.FromResult(true);
 
     public Task<CreateTestSessionResult> CreateTestSessionAsync(CreateTestSessionContext context)
         => Task.FromResult(new CreateTestSessionResult() { IsSuccess = true });
+
+    public Task<CloseTestSessionResult> CloseTestSessionAsync(CloseTestSessionContext context)
+        => Task.FromResult(new CloseTestSessionResult() { IsSuccess = true });
 
     public async Task ExecuteRequestAsync(ExecuteRequestContext context)
     {
@@ -96,41 +99,6 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         });
 
         context.Complete();
-    }
-
-    private static bool MatchesFilter(ITestExecutionFilter mtpFilter, TestCaseFilterExpression? vstestFilter, ITestCase test)
-    {
-        if (vstestFilter is not null)
-        {
-            var vsTestMatches = vstestFilter.MatchTestCase(propertyName =>
-            {
-                if (string.Equals(propertyName, "FullyQualifiedName", StringComparison.OrdinalIgnoreCase))
-                {
-                    return $"{test.TestMethod.TestClass.Class.Name}.{test.TestMethod.Method.Name}";
-                }
-                else if (string.Equals(propertyName, "DisplayName", StringComparison.OrdinalIgnoreCase))
-                {
-                    return test.DisplayName;
-                }
-
-                _ = test.Traits.TryGetValue(propertyName, out var values);
-                return values?.ToArray();
-            });
-
-            if (!vsTestMatches)
-            {
-                return false;
-            }
-        }
-
-        return mtpFilter switch
-        {
-#pragma warning disable TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            null or NopFilter => true,
-#pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
-            _ => throw new NotSupportedException($"Filter type '{mtpFilter.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
-        };
     }
 
     private async Task DiscoverTestsAsync(
@@ -232,8 +200,48 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         // TODO: SessionFileArtifact
     }
 
-    public Task<bool> IsEnabledAsync()
-        => Task.FromResult(true);
+    private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration)
+    {
+        using var sink = new TestDiscoverySink();
+        frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
+        await Task.Factory.StartNew(sink.Finished.WaitOne, TaskCreationOptions.LongRunning);
+        return sink.TestCases;
+    }
+
+    private static bool MatchesFilter(ITestExecutionFilter mtpFilter, TestCaseFilterExpression? vstestFilter, ITestCase test)
+    {
+        if (vstestFilter is not null)
+        {
+            var vsTestMatches = vstestFilter.MatchTestCase(propertyName =>
+            {
+                if (string.Equals(propertyName, "FullyQualifiedName", StringComparison.OrdinalIgnoreCase))
+                {
+                    return $"{test.TestMethod.TestClass.Class.Name}.{test.TestMethod.Method.Name}";
+                }
+                else if (string.Equals(propertyName, "DisplayName", StringComparison.OrdinalIgnoreCase))
+                {
+                    return test.DisplayName;
+                }
+
+                _ = test.Traits.TryGetValue(propertyName, out var values);
+                return values?.ToArray();
+            });
+
+            if (!vsTestMatches)
+            {
+                return false;
+            }
+        }
+
+        return mtpFilter switch
+        {
+#pragma warning disable TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            null or NopFilter => true,
+#pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
+            _ => throw new NotSupportedException($"Filter type '{mtpFilter.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
+        };
+    }
 
     private TestAssemblyConfiguration GetConfiguration(string assemblyPath)
     {
@@ -263,12 +271,4 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             shadowCopyFolder: null,
             sourceInformationProvider: null,
             diagnosticMessageSink: null);
-
-    private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration)
-    {
-        using var sink = new TestDiscoverySink();
-        frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
-        await Task.Factory.StartNew(sink.Finished.WaitOne, TaskCreationOptions.LongRunning);
-        return sink.TestCases;
-    }
 }
