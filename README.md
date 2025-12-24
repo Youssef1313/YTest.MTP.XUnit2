@@ -33,3 +33,13 @@ There are known limitations on the current support of MTP for xunit 2 which is p
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/6
 - MTP's `--maximum-failed-tests` is not yet supported.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/7
+
+## How to use
+
+To add Microsoft.Testing.Platform support to your xunit 2 test projects, all you need is to add a `PackageReference` to `YTest.MTP.XUnit2`, and you have MTP support!
+
+There are additional concerns that are general for any VSTest to MTP migration.
+
+1. If using .NET 10 SDK or later (recommended), update `global.json` to specify Microsoft.Testing.Platform as the test runner.
+1. Update any CI YML files or scripts to use the right command-line options for MTP.
+1. Enjoy running xunit 2 on Microsoft.Testing.Platform!
