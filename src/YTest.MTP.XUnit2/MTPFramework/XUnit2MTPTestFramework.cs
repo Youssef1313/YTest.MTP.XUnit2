@@ -203,8 +203,6 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
 
         await Task.Factory.StartNew(executionSink.Finished.WaitOne, TaskCreationOptions.LongRunning);
-
-        // TODO: SessionFileArtifact - https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
     }
 
     private async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)
