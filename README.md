@@ -16,11 +16,20 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
 
 ## Known limitations
 
+There are known limitations on the current support of MTP for xunit 2 which is provided by this package. If impacted by these, consider reacting with thumbs up to the issue. If you found other limitations and/or bugs, consider opening a new issue for it.
+
 - testconfig.json isn't supported. It can be supported in the future similar to https://github.com/xunit/xunit/commit/4c1c66f09e19299b3496fe962a2cb005ba57bc9d.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/1
 - RunSettings isn't supported. The XML-based configuration of VSTest (RunSettings) is not supported.
     - Limited support could be added based on https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/Utility/RunSettings.cs.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/2
 - Source information is currently missing.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/3
 - Attachments (both test-level and session-level) are not supported.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
 - `TestMethodIdentifierProperty` is missing the parameter types for parameterized tests.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
 - MTP's `--treenode-filter` is not yet supported.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/6
 - MTP's `--maximum-failed-tests` is not yet supported.
+    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/7
