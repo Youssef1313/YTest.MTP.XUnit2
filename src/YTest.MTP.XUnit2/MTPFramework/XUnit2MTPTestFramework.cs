@@ -65,20 +65,14 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             ?? throw new InvalidOperationException("XUnit2 MTP adapter cannot work when GetEntryAssembly returns null.");
 
         var assemblyPath = assembly.Location;
-#if NETFRAMEWORK
-        // Change .exe to .dll
-        assemblyPath = Path.ChangeExtension(assemblyPath, "dll");
-#else
+
+#if !NETFRAMEWORK
         if (OperatingSystem.IsWindows())
+#endif
         {
             // Change .exe to .dll
             assemblyPath = Path.ChangeExtension(assemblyPath, "dll");
         }
-        else
-        {
-            assemblyPath += ".dll";
-        }
-#endif
 
         if (!File.Exists(assemblyPath))
         {
