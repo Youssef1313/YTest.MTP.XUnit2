@@ -27,8 +27,6 @@ There are known limitations on the current support of MTP for xunit 2 which is p
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
 - `TestMethodIdentifierProperty` is missing the parameter types for parameterized tests.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
-- MTP's `--treenode-filter` is not yet supported.
-    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/6
 - MTP's `--maximum-failed-tests` is not yet supported.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/7
 

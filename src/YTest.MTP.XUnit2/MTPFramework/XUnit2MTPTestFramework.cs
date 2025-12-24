@@ -43,13 +43,13 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         _logger = loggerFactory.CreateLogger<XUnit2MTPTestFramework>();
     }
 
-    public string Uid => nameof(XUnit2MTPTestFramework);
+    public string Uid => XUnit2MTPExtension.Instance.Uid;
 
-    public string Version => "1.0.0";
+    public string Version => XUnit2MTPExtension.Instance.Version;
 
-    public string DisplayName => "XUnit 2 Microsoft.Testing.Platform adapter";
+    public string DisplayName => XUnit2MTPExtension.Instance.DisplayName;
 
-    public string Description => DisplayName;
+    public string Description => XUnit2MTPExtension.Instance.Description;
 
     public Type[] DataTypesProduced { get; } =
     [
@@ -241,10 +241,36 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         {
 #pragma warning disable TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             null or NopFilter => true,
+            TreeNodeFilter treeNodeFilter => treeNodeFilter.MatchesFilter(CreateNodePath(test), CreateFilterablePropertyBag(test)),
 #pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
+TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
             _ => throw new NotSupportedException($"Filter type '{mtpFilter.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
         };
+
+        static string CreateNodePath(ITestCase testCase)
+        {
+            var assemblyName = testCase.TestMethod.TestClass.Class.Assembly.SimpleAssemblyName();
+            var fqn = testCase.TestMethod.TestClass.Class.Name;
+            var lastDotIndex = fqn.LastIndexOf('.');
+            var namespaceName = lastDotIndex >= 0 ? fqn.Substring(0, lastDotIndex) : string.Empty;
+            var classTypeName = lastDotIndex >= 0 ? fqn.Substring(lastDotIndex + 1) : fqn;
+            var methodName = testCase.TestMethod.Method.Name;
+            return $"/{assemblyName}/{namespaceName}/{classTypeName}/{methodName}";
+        }
+
+        static PropertyBag CreateFilterablePropertyBag(ITestCase testCase)
+        {
+            var propertyBag = new PropertyBag();
+            foreach (var trait in testCase.Traits)
+            {
+                foreach (var traitValue in trait.Value)
+                {
+                    propertyBag.Add(new TestMetadataProperty(trait.Key, traitValue));
+                }
+            }
+
+            return propertyBag;
+        }
     }
 
     private async Task<TestAssemblyConfiguration> GetConfigurationAsync(string assemblyPath, CancellationToken cancellationToken)

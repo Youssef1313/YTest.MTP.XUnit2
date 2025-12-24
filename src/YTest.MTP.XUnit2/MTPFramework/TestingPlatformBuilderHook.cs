@@ -1,5 +1,6 @@
 ﻿using Microsoft.Testing.Platform.Builder;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
+using Microsoft.Testing.Platform.Helpers;
 using Microsoft.Testing.Platform.Services;
 
 namespace YTest.MTP.XUnit2;
@@ -17,6 +18,7 @@ public static class TestingPlatformBuilderHook
     public static void AddExtensions(ITestApplicationBuilder testApplicationBuilder, string[] arguments)
     {
         testApplicationBuilder.CommandLine.AddProvider(() => new XUnit2MTPCommandLineProvider());
+        testApplicationBuilder.AddTreeNodeFilterService(XUnit2MTPExtension.Instance);
         var trxReportCapability = new XUnit2MTPTestTrxCapability();
         testApplicationBuilder.RegisterTestFramework(
             capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability),
