@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -20,6 +21,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
     private readonly XUnit2MTPTestTrxCapability _trxReportCapability;
     private readonly ICommandLineOptions _commandLineOptions;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ILogger<XUnit2MTPTestFramework> _logger;
 
     public XUnit2MTPTestFramework(
         XUnit2MTPTestTrxCapability trxReportCapability,
@@ -29,6 +31,8 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         _trxReportCapability = trxReportCapability;
         _commandLineOptions = commandLineOptions;
         _loggerFactory = loggerFactory;
+
+        _logger = loggerFactory.CreateLogger<XUnit2MTPTestFramework>();
     }
 
     public string Uid => nameof(XUnit2MTPTestFramework);
@@ -135,26 +139,13 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         string assemblyPath,
         TestCaseFilterExpression? filter)
     {
-        // TODO: Expose warnings.
-        var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings: null);
-        configuration.PreEnumerateTheories ??= true;
+        var configuration = GetConfiguration(assemblyPath);
+        
+        using var frontController = GetFrontController(assemblyPath, configuration);
 
-        using var frontController = new XunitFrontController(
-            configuration.AppDomainOrDefault,
-            assemblyPath,
-            configFileName: null,
-            configuration.ShadowCopyOrDefault,
-            shadowCopyFolder: null,
-            sourceInformationProvider: null,
-            diagnosticMessageSink: null);
+        var testCases = await DiscoverAsync(frontController, configuration);
 
-        var sink = new TestDiscoverySink();
-        frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
-
-        // TODO: This might be blocking a threadpool thread. This is not good. It's better to implement our own sink that is fully async.
-        sink.Finished.WaitOne();
-
-        foreach (ITestCase test in sink.TestCases)
+        foreach (ITestCase test in testCases)
         {
             if (!MatchesFilter(discoverRequest.Filter, filter, test))
             {
@@ -221,28 +212,11 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         string assemblyPath,
         TestCaseFilterExpression? filter)
     {
-        // TODO: Expose warnings.
-        var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings: null);
-        // This similar to:
-        // 1. https://github.com/xunit/xunit/blob/4ade48a7e65aa916a20b11d38da0ec127454bf80/src/common/MicrosoftTestingPlatform/TestPlatformTestFramework.cs#L156-L158
-        // 2. https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L210-L212
-        // 3. https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L497-L499
-        configuration.PreEnumerateTheories ??= true;
+        var configuration = GetConfiguration(assemblyPath);
 
-        using var frontController = new XunitFrontController(
-            configuration.AppDomainOrDefault,
-            assemblyPath,
-            configFileName: null,
-            configuration.ShadowCopyOrDefault,
-            shadowCopyFolder: null,
-            sourceInformationProvider: null,
-            diagnosticMessageSink: null);
+        using var frontController = GetFrontController(assemblyPath, configuration);
 
-        var sink = new TestDiscoverySink();
-        frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
-
-        // TODO: This might be blocking a threadpool thread. This is not good. It's better to implement our own sink that is fully async.
-        sink.Finished.WaitOne();
+        var testCases = await DiscoverAsync(frontController, configuration);
 
         var assemblyDisplayName = Path.GetFileNameWithoutExtension(assemblyPath);
 
@@ -255,7 +229,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
         var executionSink = new ExecutionSink(new MTPExecutionSink(this, context, _trxReportCapability.IsEnabled), executionSinkOptions);
 
-        frontController.RunTests(sink.TestCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
+        frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
 
         executionSink.Finished.WaitOne();
 
@@ -264,4 +238,44 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
     public Task<bool> IsEnabledAsync()
         => Task.FromResult(true);
+
+    private TestAssemblyConfiguration GetConfiguration(string assemblyPath)
+    {
+        var warnings = new List<string>();
+        var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings);
+
+        // This similar to:
+        // 1. https://github.com/xunit/xunit/blob/4ade48a7e65aa916a20b11d38da0ec127454bf80/src/common/MicrosoftTestingPlatform/TestPlatformTestFramework.cs#L156-L158
+        // 2. https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L210-L212
+        // 3. https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L497-L499
+        configuration.PreEnumerateTheories ??= true;
+
+        foreach (var warning in warnings)
+        {
+            _logger.LogWarning(warning);
+        }
+
+        return configuration;
+    }
+
+    private static XunitFrontController GetFrontController(string assemblyPath, TestAssemblyConfiguration configuration)
+        => new XunitFrontController(
+            configuration.AppDomainOrDefault,
+            assemblyPath,
+            configFileName: null,
+            configuration.ShadowCopyOrDefault,
+            shadowCopyFolder: null,
+            sourceInformationProvider: null,
+            diagnosticMessageSink: null);
+
+    private static Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration)
+    {
+        using var sink = new TestDiscoverySink();
+        frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
+
+        // TODO: This might be blocking a threadpool thread. This is not good. It's better to implement our own sink that is fully async.
+        sink.Finished.WaitOne();
+
+        return Task.FromResult(sink.TestCases);
+    }
 }
