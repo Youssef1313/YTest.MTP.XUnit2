@@ -12,6 +12,7 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
 - Discovering tests, along with traits.
 - `TestMethodIdentifierProperty` is supported, but not for parameterized tests yet (known limitation).
 - `xunit.runner.json` is supported.
+- Reporting TRX files via Microsoft.Testing.Extensions.TrxReport (using `--report-trx`) is supported.
 
 ## Known limitations
 
