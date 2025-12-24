@@ -17,8 +17,10 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
 
 - testconfig.json isn't supported. It can be supported in the future similar to https://github.com/xunit/xunit/commit/4c1c66f09e19299b3496fe962a2cb005ba57bc9d.
 - RunSettings isn't supported. The XML-based configuration of VSTest (RunSettings) is not supported.
+    - Limited support could be added based on https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/Utility/RunSettings.cs.
 - Source information is currently missing.
 - Attachments (both test-level and session-level) are not supported.
 - `TestMethodIdentifierProperty` is missing the parameter types for parameterized tests.
 - MTP's `--treenode-filter` is not yet supported.
 - MTP's `--maximum-failed-tests` is not yet supported.
+- Cancellation isn't yet supported.

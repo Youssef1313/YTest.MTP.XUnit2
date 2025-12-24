@@ -12,5 +12,11 @@ internal sealed class XUnitFailureException : Exception
         StackTrace = ExceptionUtility.CombineStackTraces(failureInformation);
     }
 
+    public XUnitFailureException(IFailureInformation failureInformation, string messagePrefix)
+    : base($"[{messagePrefix}]: {ExceptionUtility.CombineMessages(failureInformation)}")
+    {
+        StackTrace = ExceptionUtility.CombineStackTraces(failureInformation);
+    }
+
     public override string StackTrace { get; }
 }
