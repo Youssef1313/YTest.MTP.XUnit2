@@ -12,12 +12,14 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
     private readonly IDataProducer _dataProducer;
     private readonly ExecuteRequestContext _executeRequestContext;
     private readonly bool _isTrxEnabled;
+    private readonly GracefulStopTestExecutionCapability _gracefulStopTestExecutionCapability;
 
-    public MTPExecutionSink(IDataProducer dataProducer, ExecuteRequestContext executeRequestContext, bool isTrxEnabled)
+    public MTPExecutionSink(IDataProducer dataProducer, ExecuteRequestContext executeRequestContext, bool isTrxEnabled, GracefulStopTestExecutionCapability gracefulStopTestExecutionCapability)
     {
         _dataProducer = dataProducer;
         _executeRequestContext = executeRequestContext;
         _isTrxEnabled = isTrxEnabled;
+        _gracefulStopTestExecutionCapability = gracefulStopTestExecutionCapability;
 
         Execution.TestCaseStartingEvent += OnTestCaseStarting;
         Execution.TestFailedEvent += OnTestFailed;
@@ -183,7 +185,7 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
 
     private void StopIfCancellationIsRequested(MessageHandlerArgs args)
     {
-        if (_executeRequestContext.CancellationToken.IsCancellationRequested)
+        if (_executeRequestContext.CancellationToken.IsCancellationRequested || _gracefulStopTestExecutionCapability.IsGracefulStopRequested)
         {
             args.Stop();
         }

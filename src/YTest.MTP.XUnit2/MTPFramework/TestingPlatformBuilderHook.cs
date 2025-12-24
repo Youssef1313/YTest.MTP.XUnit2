@@ -19,9 +19,13 @@ public static class TestingPlatformBuilderHook
     {
         testApplicationBuilder.CommandLine.AddProvider(() => new XUnit2MTPCommandLineProvider());
         testApplicationBuilder.AddTreeNodeFilterService(XUnit2MTPExtension.Instance);
+#pragma warning disable TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        testApplicationBuilder.AddMaximumFailedTestsService(XUnit2MTPExtension.Instance);
+#pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         var trxReportCapability = new XUnit2MTPTestTrxCapability();
+        var gracefulStopTestExecutionCapability = new GracefulStopTestExecutionCapability();
         testApplicationBuilder.RegisterTestFramework(
-            capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability),
-            frameworkFactory: (_, sp) => new XUnit2MTPTestFramework(trxReportCapability, sp.GetCommandLineOptions(), sp.GetOutputDevice(), sp.GetLoggerFactory()));
+            capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability, gracefulStopTestExecutionCapability),
+            frameworkFactory: (_, sp) => new XUnit2MTPTestFramework(trxReportCapability, gracefulStopTestExecutionCapability, sp.GetCommandLineOptions(), sp.GetOutputDevice(), sp.GetLoggerFactory()));
     }
 }

@@ -10,9 +10,12 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
     - The VSTest `--filter` syntax is actually not supported by xunit.v3 under MTP. However, it's supported by this package for xunit 2 users. This is done to ease migration.
 - Reporting test results (passed, failed, skipped).
 - Discovering tests, along with traits.
-- `TestMethodIdentifierProperty` is supported, but not for parameterized tests yet (known limitation).
+- `TestMethodIdentifierProperty` is supported.
 - `xunit.runner.json` is supported.
 - Reporting TRX files via Microsoft.Testing.Extensions.TrxReport (using `--report-trx`) is supported.
+- Source information are reported, except when IDE explicitly requests to not calculate it (for perf reasons).
+- MTP's `--treenode-filter` is supported.
+- MTP's `--maximum-failed-tests` is supported.
 
 ## Known limitations
 
@@ -25,10 +28,8 @@ There are known limitations on the current support of MTP for xunit 2 which is p
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/2
 - Attachments (both test-level and session-level) are not supported.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
-- `TestMethodIdentifierProperty` is missing the parameter types for parameterized tests.
+- `TestMethodIdentifierProperty` for parameters that represent generic types might not work well.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
-- MTP's `--maximum-failed-tests` is not yet supported.
-    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/7
 
 ## How to use
 

@@ -24,6 +24,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
     IOutputDeviceDataProducer
 {
     private readonly XUnit2MTPTestTrxCapability _trxReportCapability;
+    private readonly GracefulStopTestExecutionCapability _gracefulStopTestExecutionCapability;
     private readonly ICommandLineOptions _commandLineOptions;
     private readonly IOutputDevice _outputDevice;
     private readonly ILoggerFactory _loggerFactory;
@@ -31,11 +32,13 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
     public XUnit2MTPTestFramework(
         XUnit2MTPTestTrxCapability trxReportCapability,
+        GracefulStopTestExecutionCapability gracefulStopTestExecutionCapability,
         ICommandLineOptions commandLineOptions,
         IOutputDevice outputDevice,
         ILoggerFactory loggerFactory)
     {
         _trxReportCapability = trxReportCapability;
+        _gracefulStopTestExecutionCapability = gracefulStopTestExecutionCapability;
         _commandLineOptions = commandLineOptions;
         _outputDevice = outputDevice;
         _loggerFactory = loggerFactory;
@@ -196,7 +199,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             LongRunningTestTime = TimeSpan.FromSeconds(configuration.LongRunningTestSecondsOrDefault),
         };
 
-        var executionSink = new ExecutionSink(new MTPExecutionSink(this, context, _trxReportCapability.IsEnabled), executionSinkOptions);
+        var executionSink = new ExecutionSink(new MTPExecutionSink(this, context, _trxReportCapability.IsEnabled, _gracefulStopTestExecutionCapability), executionSinkOptions);
         frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
 
         await Task.Factory.StartNew(executionSink.Finished.WaitOne, TaskCreationOptions.LongRunning);
@@ -204,9 +207,9 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         // TODO: SessionFileArtifact - https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
     }
 
-    private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)
+    private async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)
     {
-        using var sink = new TestDiscoverySink(() => cancellationToken.IsCancellationRequested);
+        using var sink = new TestDiscoverySink(() => cancellationToken.IsCancellationRequested || _gracefulStopTestExecutionCapability.IsGracefulStopRequested);
         frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
         await Task.Factory.StartNew(sink.Finished.WaitOne, TaskCreationOptions.LongRunning);
         return sink.TestCases;
