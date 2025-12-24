@@ -274,8 +274,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             configFileName: null,
             configuration.ShadowCopyOrDefault,
             shadowCopyFolder: null,
-            // TODO: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/3
-            sourceInformationProvider: null,
+            sourceInformationProvider: CecilSourceInformationProvider.Create(assemblyPath),
             diagnosticMessageSink);
 
     private MTPDiagnosticMessageSink GetDiagnosticMessageSink(string assemblyPath, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)

@@ -12,5 +12,6 @@
     <PackageVersion Include="xunit.extensibility.core" Version="2.9.3" />
     <PackageVersion Include="xunit.extensibility.execution" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.utility" Version="2.9.3" />
+    <PackageVersion Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
 </Project>
