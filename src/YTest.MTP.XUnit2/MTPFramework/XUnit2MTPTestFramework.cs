@@ -223,6 +223,10 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
     {
         // TODO: Expose warnings.
         var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings: null);
+        // This similar to:
+        // 1. https://github.com/xunit/xunit/blob/4ade48a7e65aa916a20b11d38da0ec127454bf80/src/common/MicrosoftTestingPlatform/TestPlatformTestFramework.cs#L156-L158
+        // 2. https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L210-L212
+        // 3. https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L497-L499
         configuration.PreEnumerateTheories ??= true;
 
         using var frontController = new XunitFrontController(
