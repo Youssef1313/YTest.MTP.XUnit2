@@ -213,13 +213,10 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         TestCaseFilterExpression? filter)
     {
         var configuration = GetConfiguration(assemblyPath);
-
         using var frontController = GetFrontController(assemblyPath, configuration);
-
         var testCases = await DiscoverAsync(frontController, configuration);
 
         var assemblyDisplayName = Path.GetFileNameWithoutExtension(assemblyPath);
-
         var executionSinkOptions = new ExecutionSinkOptions
         {
             DiagnosticMessageSink = new MTPDiagnosticMessageSink(_loggerFactory, assemblyDisplayName, configuration.DiagnosticMessagesOrDefault),
@@ -228,10 +225,9 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         };
 
         var executionSink = new ExecutionSink(new MTPExecutionSink(this, context, _trxReportCapability.IsEnabled), executionSinkOptions);
-
         frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
 
-        executionSink.Finished.WaitOne();
+        await Task.Factory.StartNew(executionSink.Finished.WaitOne, TaskCreationOptions.LongRunning);
 
         // TODO: SessionFileArtifact
     }
@@ -268,14 +264,11 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             sourceInformationProvider: null,
             diagnosticMessageSink: null);
 
-    private static Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration)
+    private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration)
     {
         using var sink = new TestDiscoverySink();
         frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
-
-        // TODO: This might be blocking a threadpool thread. This is not good. It's better to implement our own sink that is fully async.
-        sink.Finished.WaitOne();
-
-        return Task.FromResult(sink.TestCases);
+        await Task.Factory.StartNew(sink.Finished.WaitOne, TaskCreationOptions.LongRunning);
+        return sink.TestCases;
     }
 }

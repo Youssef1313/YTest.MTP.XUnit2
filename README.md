@@ -20,3 +20,5 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
 - Source information is currently missing.
 - Attachments (both test-level and session-level) are not supported.
 - `TestMethodIdentifierProperty` is missing the parameter types for parameterized tests.
+- MTP's `--treenode-filter` is not yet supported.
+- MTP's `--maximum-failed-tests` is not yet supported.
