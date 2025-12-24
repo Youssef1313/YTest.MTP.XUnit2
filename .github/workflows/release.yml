@@ -89,7 +89,7 @@ jobs:
           path: ./packages
 
       - name: Authenticate to nuget
-        uses: NuGet/login
+        uses: NuGet/login@d22cc5f58ff5b88bf9bd452535b4335137e24544 # v1.1.0
         id: nugetlogin
         with:
           user: Youssef1313
