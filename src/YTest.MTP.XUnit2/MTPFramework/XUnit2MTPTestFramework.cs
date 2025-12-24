@@ -7,6 +7,7 @@ using Microsoft.Testing.Extensions.TrxReport.Abstractions;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.TestFramework;
+using Microsoft.Testing.Platform.Logging;
 using Microsoft.Testing.Platform.Requests;
 using Xunit;
 using Xunit.Abstractions;
@@ -18,11 +19,16 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 {
     private readonly XUnit2MTPTestTrxCapability _trxReportCapability;
     private readonly ICommandLineOptions _commandLineOptions;
+    private readonly ILoggerFactory _loggerFactory;
 
-    public XUnit2MTPTestFramework(XUnit2MTPTestTrxCapability trxReportCapability, ICommandLineOptions commandLineOptions)
+    public XUnit2MTPTestFramework(
+        XUnit2MTPTestTrxCapability trxReportCapability,
+        ICommandLineOptions commandLineOptions,
+        ILoggerFactory loggerFactory)
     {
         _trxReportCapability = trxReportCapability;
         _commandLineOptions = commandLineOptions;
+        _loggerFactory = loggerFactory;
     }
 
     public string Uid => nameof(XUnit2MTPTestFramework);
@@ -234,9 +240,11 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         // TODO: This might be blocking a threadpool thread. This is not good. It's better to implement our own sink that is fully async.
         sink.Finished.WaitOne();
 
+        var assemblyDisplayName = Path.GetFileNameWithoutExtension(assemblyPath);
+
         var executionSinkOptions = new ExecutionSinkOptions
         {
-            DiagnosticMessageSink = NopMessageSink.Instance,
+            DiagnosticMessageSink = new MTPDiagnosticMessageSink(_loggerFactory, assemblyDisplayName, configuration.DiagnosticMessagesOrDefault),
             FailSkips = configuration.FailSkipsOrDefault,
             LongRunningTestTime = TimeSpan.FromSeconds(configuration.LongRunningTestSecondsOrDefault),
         };

@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace YTest.MTP.XUnit2;
 
-internal sealed class MTPExecutionSink : TestMessageSink
+internal sealed partial class MTPExecutionSink : TestMessageSink
 {
     private readonly IDataProducer _dataProducer;
     private readonly ExecuteRequestContext _executeRequestContext;
@@ -38,7 +38,7 @@ internal sealed class MTPExecutionSink : TestMessageSink
     private void OnTestFailed(MessageHandlerArgs<ITestFailed> args)
     {
         var testNode = CreateTestNode(args.Message);
-        var failureException = new XUnitTestFailureException(args.Message);
+        var failureException = new XUnitFailureException(args.Message);
         testNode.Properties.Add(new FailedTestNodeStateProperty(failureException));
         if (_isTrxEnabled)
         {
@@ -107,16 +107,5 @@ internal sealed class MTPExecutionSink : TestMessageSink
         }
 
         return testNode;
-    }
-
-    private sealed class XUnitTestFailureException : Exception
-    {
-        public XUnitTestFailureException(IFailureInformation failureInformation)
-            : base(ExceptionUtility.CombineMessages(failureInformation))
-        {
-            StackTrace = ExceptionUtility.CombineStackTraces(failureInformation);
-        }
-
-        public override string StackTrace { get; }
     }
 }
