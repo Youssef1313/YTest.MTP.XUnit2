@@ -24,4 +24,3 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
 - `TestMethodIdentifierProperty` is missing the parameter types for parameterized tests.
 - MTP's `--treenode-filter` is not yet supported.
 - MTP's `--maximum-failed-tests` is not yet supported.
-- Cancellation isn't yet supported.

@@ -38,10 +38,14 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
         var testNode = CreateTestNode(args.Message);
         testNode.Properties.Add(InProgressTestNodeStateProperty.CachedInstance);
         PublishTestUpdate(testNode);
+        StopIfCancellationIsRequested(args);
     }
 
     private void OnTestFailed(MessageHandlerArgs<ITestFailed> args)
-        => OnFailure(null, args.Message, args.Message);
+    {
+        OnFailure(null, args.Message, args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnTestPassed(MessageHandlerArgs<ITestPassed> args)
     {
@@ -49,6 +53,7 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
         testNode.Properties.Add(PassedTestNodeStateProperty.CachedInstance);
 
         PublishTestUpdate(testNode);
+        StopIfCancellationIsRequested(args);
     }
 
     private void OnTestSkipped(MessageHandlerArgs<ITestSkipped> args)
@@ -56,25 +61,44 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
         var testNode = CreateTestNode(args.Message);
         testNode.Properties.Add(new SkippedTestNodeStateProperty(args.Message.Reason));
         PublishTestUpdate(testNode);
+        StopIfCancellationIsRequested(args);
     }
 
     private void OnTestClassCleanupFailure(MessageHandlerArgs<ITestClassCleanupFailure> args)
-        => OnCleanupFailure($"Test Class Cleanup Failure ({args.Message.TestClass.Class.Name})", args.Message);
+    {
+        OnCleanupFailure($"Test Class Cleanup Failure ({args.Message.TestClass.Class.Name})", args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnTestAssemblyCleanupFailure(MessageHandlerArgs<ITestAssemblyCleanupFailure> args)
-        => OnCleanupFailure($"Test Assembly Cleanup Failure ({args.Message.TestAssembly.Assembly.Name})", args.Message);
+    {
+        OnCleanupFailure($"Test Assembly Cleanup Failure ({args.Message.TestAssembly.Assembly.Name})", args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnTestCaseCleanupFailure(MessageHandlerArgs<ITestCaseCleanupFailure> args)
-        => OnCleanupFailure($"Test Case Cleanup Failure ({args.Message.TestCase.DisplayName})", args.Message);
+    {
+        OnCleanupFailure($"Test Case Cleanup Failure ({args.Message.TestCase.DisplayName})", args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnTestMethodCleanupFailure(MessageHandlerArgs<ITestMethodCleanupFailure> args)
-        => OnCleanupFailure($"Test Method Cleanup Failure ({args.Message.TestMethod.TestClass.Class.Name}.{args.Message.TestMethod.Method.Name})", args.Message);
+    {
+        OnCleanupFailure($"Test Method Cleanup Failure ({args.Message.TestMethod.TestClass.Class.Name}.{args.Message.TestMethod.Method.Name})", args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnTestCollectionCleanupFailure(MessageHandlerArgs<ITestCollectionCleanupFailure> args)
-        => OnCleanupFailure($"Test Collection Cleanup Failure ({args.Message.TestCollection.DisplayName})", args.Message);
+    {
+        OnCleanupFailure($"Test Collection Cleanup Failure ({args.Message.TestCollection.DisplayName})", args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnTestCleanupFailure(MessageHandlerArgs<ITestCleanupFailure> args)
-        => OnCleanupFailure($"Test Cleanup Failure ({args.Message.Test.DisplayName})", args.Message);
+    {
+        OnCleanupFailure($"Test Cleanup Failure ({args.Message.Test.DisplayName})", args.Message);
+        StopIfCancellationIsRequested(args);
+    }
 
     private void OnCleanupFailure<T>(string failureName, T message) where T : IFailureInformation, IExecutionMessage
     {
@@ -155,5 +179,13 @@ internal sealed partial class MTPExecutionSink : TestMessageSink
         }
 
         return testNode;
+    }
+
+    private void StopIfCancellationIsRequested(MessageHandlerArgs args)
+    {
+        if (_executeRequestContext.CancellationToken.IsCancellationRequested)
+        {
+            args.Stop();
+        }
     }
 }

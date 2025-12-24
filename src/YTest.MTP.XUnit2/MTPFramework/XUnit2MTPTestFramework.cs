@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Testing.Extensions.TrxReport.Abstractions;
 using Microsoft.Testing.Platform.CommandLine;
@@ -111,7 +112,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         
         using var frontController = GetFrontController(assemblyPath, configuration);
 
-        var testCases = await DiscoverAsync(frontController, configuration);
+        var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
 
         foreach (ITestCase test in testCases)
         {
@@ -182,7 +183,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
     {
         var configuration = GetConfiguration(assemblyPath);
         using var frontController = GetFrontController(assemblyPath, configuration);
-        var testCases = await DiscoverAsync(frontController, configuration);
+        var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
 
         var assemblyDisplayName = Path.GetFileNameWithoutExtension(assemblyPath);
         var executionSinkOptions = new ExecutionSinkOptions
@@ -200,9 +201,9 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         // TODO: SessionFileArtifact
     }
 
-    private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration)
+    private static async Task<List<ITestCase>> DiscoverAsync(XunitFrontController frontController, TestAssemblyConfiguration configuration, CancellationToken cancellationToken)
     {
-        using var sink = new TestDiscoverySink();
+        using var sink = new TestDiscoverySink(() => cancellationToken.IsCancellationRequested);
         frontController.Find(includeSourceInformation: true, sink, TestFrameworkOptions.ForDiscovery(configuration));
         await Task.Factory.StartNew(sink.Finished.WaitOne, TaskCreationOptions.LongRunning);
         return sink.TestCases;
