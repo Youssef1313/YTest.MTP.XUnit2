@@ -1,5 +1,6 @@
 ﻿using Microsoft.Testing.Platform.Builder;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
+using Microsoft.Testing.Platform.Services;
 
 namespace YTest.MTP.XUnit2;
 
@@ -16,9 +17,10 @@ public static class TestingPlatformBuilderHook
     public static void AddExtensions(ITestApplicationBuilder testApplicationBuilder, string[] arguments)
     {
         // TODO: Add support for VSTest's --filter.
+        testApplicationBuilder.CommandLine.AddProvider(() => new XUnit2MTPCommandLineProvider());
         var trxReportCapability = new XUnit2MTPTestTrxCapability();
         testApplicationBuilder.RegisterTestFramework(
             capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability),
-            frameworkFactory: (_, _) => new XUnit2MTPTestFramework(trxReportCapability));
+            frameworkFactory: (_, sp) => new XUnit2MTPTestFramework(trxReportCapability, sp.GetCommandLineOptions()));
     }
 }

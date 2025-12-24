@@ -4,21 +4,25 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Testing.Extensions.TrxReport.Abstractions;
+using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.TestFramework;
 using Microsoft.Testing.Platform.Requests;
 using Xunit;
 using Xunit.Abstractions;
+using YTest.MTP.XUnit2.Filter;
 
 namespace YTest.MTP.XUnit2;
 
 internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extensions.TestFramework.ITestFramework, IDataProducer
 {
     private readonly XUnit2MTPTestTrxCapability _trxReportCapability;
+    private readonly ICommandLineOptions _commandLineOptions;
 
-    public XUnit2MTPTestFramework(XUnit2MTPTestTrxCapability trxReportCapability)
+    public XUnit2MTPTestFramework(XUnit2MTPTestTrxCapability trxReportCapability, ICommandLineOptions commandLineOptions)
     {
         _trxReportCapability = trxReportCapability;
+        _commandLineOptions = commandLineOptions;
     }
 
     public string Uid => nameof(XUnit2MTPTestFramework);
@@ -67,27 +71,63 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             throw new FileNotFoundException("XUnit2 MTP adapter cannot find the test assembly.", assemblyPath);
         }
 
+        TestCaseFilterExpression? filter = null;
+        if (_commandLineOptions.TryGetOptionArgumentList(XUnit2MTPCommandLineProvider.FilterOptionName, out string[]? filterValue) &&
+            filterValue.Length == 1)
+        {
+            filter = new TestCaseFilterExpression(new FilterExpressionWrapper(filterValue[0]));
+        }
+
         await (context.Request switch 
         {
-            DiscoverTestExecutionRequest discoverRequest => DiscoverTestsAsync(discoverRequest, context, assemblyPath),
-            RunTestExecutionRequest runRequest => RunTestsAsync(runRequest, context, assemblyPath),
+            DiscoverTestExecutionRequest discoverRequest => DiscoverTestsAsync(discoverRequest, context, assemblyPath, filter),
+            RunTestExecutionRequest runRequest => RunTestsAsync(runRequest, context, assemblyPath, filter),
             _ => throw new NotSupportedException($"Request type '{context.Request.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
         });
 
         context.Complete();
     }
 
-    private static bool MatchesFilter(ITestExecutionFilter filter, ITestCase test)
-        => filter switch
+    private static bool MatchesFilter(ITestExecutionFilter mtpFilter, TestCaseFilterExpression? vstestFilter, ITestCase test)
+    {
+        if (vstestFilter is not null)
+        {
+            var vsTestMatches = vstestFilter.MatchTestCase(propertyName =>
+            {
+                if (string.Equals(propertyName, "FullyQualifiedName", StringComparison.OrdinalIgnoreCase))
+                {
+                    return $"{test.TestMethod.TestClass.Class.Name}.{test.TestMethod.Method.Name}";
+                }
+                else if (string.Equals(propertyName, "DisplayName", StringComparison.OrdinalIgnoreCase))
+                {
+                    return test.DisplayName;
+                }
+
+                _ = test.Traits.TryGetValue(propertyName, out var values);
+                return values?.ToArray();
+            });
+
+            if (!vsTestMatches)
+            {
+                return false;
+            }
+        }
+
+        return mtpFilter switch
         {
 #pragma warning disable TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             null or NopFilter => true,
 #pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
-            _ => throw new NotSupportedException($"Filter type '{filter.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
+            _ => throw new NotSupportedException($"Filter type '{mtpFilter.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
         };
+    }
 
-    private async Task DiscoverTestsAsync(DiscoverTestExecutionRequest discoverRequest, ExecuteRequestContext context, string assemblyPath)
+    private async Task DiscoverTestsAsync(
+        DiscoverTestExecutionRequest discoverRequest,
+        ExecuteRequestContext context,
+        string assemblyPath,
+        TestCaseFilterExpression? filter)
     {
         // TODO: Expose warnings.
         var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings: null);
@@ -110,7 +150,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
         foreach (ITestCase test in sink.TestCases)
         {
-            if (!MatchesFilter(discoverRequest.Filter, test))
+            if (!MatchesFilter(discoverRequest.Filter, filter, test))
             {
                 continue;
             }
@@ -169,7 +209,11 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         }
     }
 
-    private async Task RunTestsAsync(RunTestExecutionRequest runRequest, ExecuteRequestContext context, string assemblyPath)
+    private async Task RunTestsAsync(
+        RunTestExecutionRequest runRequest,
+        ExecuteRequestContext context,
+        string assemblyPath,
+        TestCaseFilterExpression? filter)
     {
         // TODO: Expose warnings.
         var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings: null);
@@ -199,8 +243,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
         var executionSink = new ExecutionSink(new MTPExecutionSink(this, context, _trxReportCapability.IsEnabled), executionSinkOptions);
 
-        // Here, create my own message sink that will transform results from the xunit model to the MTP model and publish the result to message bus.
-        frontController.RunTests(sink.TestCases.Where(tc => MatchesFilter(runRequest.Filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
+        frontController.RunTests(sink.TestCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
 
         executionSink.Finished.WaitOne();
 
