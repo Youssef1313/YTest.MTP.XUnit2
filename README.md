@@ -26,8 +26,6 @@ There are known limitations on the current support of MTP for xunit 2 which is p
 - RunSettings isn't supported. The XML-based configuration of VSTest (RunSettings) is not supported.
     - Limited support could be added based on https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/Utility/RunSettings.cs.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/2
-- Attachments (both test-level and session-level) are not supported.
-    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/4
 - `TestMethodIdentifierProperty` for parameters that represent generic types might not work well.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
 
