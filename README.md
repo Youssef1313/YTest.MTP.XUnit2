@@ -8,6 +8,9 @@ The general recommendation is to migrate from xunit 2 to xunit.v3 which already 
 
 - The VSTest `--filter`.
     - The VSTest `--filter` syntax is actually not supported by xunit.v3 under MTP. However, it's supported by this package for xunit 2 users. This is done to ease migration.
+- The VSTest `--settings` option to specify a runsettings file is partially supported.
+    - The VSTest `--settings` option is actually not supported by xunit.v3 under MTP. However, it's supported by this package for xunit 2 users. This is done to ease migration.
+    - Note that not the full RunSettings options are supported. Only the xunit-specific configurations are supported.
 - Reporting test results (passed, failed, skipped).
 - Discovering tests, along with traits.
 - `TestMethodIdentifierProperty` is supported.

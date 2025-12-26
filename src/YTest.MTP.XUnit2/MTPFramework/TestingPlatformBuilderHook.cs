@@ -24,8 +24,9 @@ public static class TestingPlatformBuilderHook
 #pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         var trxReportCapability = new XUnit2MTPTestTrxCapability();
         var gracefulStopTestExecutionCapability = new GracefulStopTestExecutionCapability();
+        var bannerCapability = new BannerMessageOwnerCapability();
         testApplicationBuilder.RegisterTestFramework(
-            capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability, gracefulStopTestExecutionCapability),
+            capabilitiesFactory: _ => new TestFrameworkCapabilities(trxReportCapability, gracefulStopTestExecutionCapability, bannerCapability),
             frameworkFactory: (_, sp) => new XUnit2MTPTestFramework(trxReportCapability, gracefulStopTestExecutionCapability, sp.GetCommandLineOptions(), sp.GetOutputDevice(), sp.GetLoggerFactory()));
     }
 }
