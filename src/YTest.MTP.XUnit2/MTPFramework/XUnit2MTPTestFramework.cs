@@ -96,10 +96,27 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             filter = new TestCaseFilterExpression(new FilterExpressionWrapper(filterValue[0]));
         }
 
+        string? runSettingsXml = null;
+        if (_commandLineOptions.TryGetOptionArgumentList(XUnit2MTPCommandLineProvider.SettingsOptionName, out string[]? settingsFilePaths) &&
+            settingsFilePaths.Length == 1)
+        {
+            var settingsFilePath = settingsFilePaths[0];
+            if (File.Exists(settingsFilePath))
+            {
+                runSettingsXml = File.ReadAllText(settingsFilePath);
+            }
+            else
+            {
+                throw new FileNotFoundException($"RunSettings file '{settingsFilePath}' which is provided by '--settings' doesn't exist.");
+            }
+        }
+
+        RunSettings runSettings = RunSettings.Parse(runSettingsXml);
+
         await (context.Request switch 
         {
-            DiscoverTestExecutionRequest discoverRequest => DiscoverTestsAsync(discoverRequest, context, assemblyPath, filter),
-            RunTestExecutionRequest runRequest => RunTestsAsync(runRequest, context, assemblyPath, filter),
+            DiscoverTestExecutionRequest discoverRequest => DiscoverTestsAsync(discoverRequest, context, assemblyPath, filter, runSettings),
+            RunTestExecutionRequest runRequest => RunTestsAsync(runRequest, context, assemblyPath, filter, runSettings),
             _ => throw new NotSupportedException($"Request type '{context.Request.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
         });
 
@@ -110,9 +127,10 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         DiscoverTestExecutionRequest discoverRequest,
         ExecuteRequestContext context,
         string assemblyPath,
-        TestCaseFilterExpression? filter)
+        TestCaseFilterExpression? filter,
+        RunSettings runSettings)
     {
-        var configuration = await GetConfigurationAsync(assemblyPath, context.CancellationToken);
+        var configuration = await GetConfigurationAsync(assemblyPath, runSettings, context.CancellationToken);
         var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration, context.CancellationToken);
         using var frontController = GetFrontController(assemblyPath, configuration, diagnosticMessageSink);
         var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
@@ -185,9 +203,10 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         RunTestExecutionRequest runRequest,
         ExecuteRequestContext context,
         string assemblyPath,
-        TestCaseFilterExpression? filter)
+        TestCaseFilterExpression? filter,
+        RunSettings runSettings)
     {
-        var configuration = await GetConfigurationAsync(assemblyPath, context.CancellationToken);
+        var configuration = await GetConfigurationAsync(assemblyPath, runSettings, context.CancellationToken);
         var diagnosticMessageSink = GetDiagnosticMessageSink(assemblyPath, configuration, context.CancellationToken);
         using var frontController = GetFrontController(assemblyPath, configuration, diagnosticMessageSink);
         var testCases = await DiscoverAsync(frontController, configuration, context.CancellationToken);
@@ -200,7 +219,16 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
         };
 
         var executionSink = new ExecutionSink(new MTPExecutionSink(this, context, _trxReportCapability.IsEnabled, _gracefulStopTestExecutionCapability), executionSinkOptions);
-        frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, TestFrameworkOptions.ForExecution(configuration));
+        var testFrameworkOptions = TestFrameworkOptions.ForExecution(configuration);
+
+        // Replicates https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/VsTestRunner.cs#L606-L610
+        if (!configuration.ParallelizeTestCollectionsOrDefault)
+        {
+            testFrameworkOptions.SetSynchronousMessageReporting(true);
+            testFrameworkOptions.SetDisableParallelization(true);
+        }
+
+        frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, testFrameworkOptions);
 
         await Task.Factory.StartNew(executionSink.Finished.WaitOne, TaskCreationOptions.LongRunning);
     }
@@ -274,10 +302,12 @@ TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUid
         }
     }
 
-    private async Task<TestAssemblyConfiguration> GetConfigurationAsync(string assemblyPath, CancellationToken cancellationToken)
+    private async Task<TestAssemblyConfiguration> GetConfigurationAsync(string assemblyPath, RunSettings runSettings, CancellationToken cancellationToken)
     {
         var warnings = new List<string>();
         var configuration = ConfigReader.Load(assemblyPath, configFileName: null, warnings);
+
+        runSettings.CopyTo(configuration);
 
         // This similar to:
         // 1. https://github.com/xunit/xunit/blob/4ade48a7e65aa916a20b11d38da0ec127454bf80/src/common/MicrosoftTestingPlatform/TestPlatformTestFramework.cs#L156-L158

@@ -9,10 +9,12 @@ namespace YTest.MTP.XUnit2;
 internal class XUnit2MTPCommandLineProvider : ICommandLineOptionsProvider
 {
     public const string FilterOptionName = "filter";
+    public const string SettingsOptionName = "settings";
 
     private readonly IReadOnlyCollection<CommandLineOption> _commandLineOptions =
     [
         new CommandLineOption(FilterOptionName, "Provides VSTest filter support", ArgumentArity.ExactlyOne, isHidden: false),
+        new CommandLineOption(SettingsOptionName, "Provides RunSettings support for xunit-specific configurations (not the full set of VSTest RunSettings)", ArgumentArity.ExactlyOne, isHidden: false),
     ];
 
     public string Uid => nameof(XUnit2MTPCommandLineProvider);

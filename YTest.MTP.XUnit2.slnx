@@ -12,6 +12,7 @@
     <File Path="Directory.Packages.props" />
     <File Path="global.json" />
     <File Path="nuget.config" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/YTest.MTP.XUnit2/YTest.MTP.XUnit2.csproj" />

@@ -1,4 +1,4 @@
-# YTest.MTP.XUnit2
+s# YTest.MTP.XUnit2
 
 This package provides Microsoft.Testing.Platform support for xunit 2 test projects.
 
@@ -23,9 +23,6 @@ There are known limitations on the current support of MTP for xunit 2 which is p
 
 - testconfig.json isn't supported. It can be supported in the future similar to https://github.com/xunit/xunit/commit/4c1c66f09e19299b3496fe962a2cb005ba57bc9d.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/1
-- RunSettings isn't supported. The XML-based configuration of VSTest (RunSettings) is not supported.
-    - Limited support could be added based on https://github.com/xunit/visualstudio.xunit/blob/d693866207d8c1b3269d1b7f4f62211b82ba7835/src/xunit.runner.visualstudio/Utility/RunSettings.cs.
-    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/2
 - `TestMethodIdentifierProperty` for parameters that represent generic types might not work well.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
 
