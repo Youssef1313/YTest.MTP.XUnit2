@@ -12,6 +12,7 @@
     <DebugType>embedded</DebugType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- By default, NuGet doesn't include portable PDBs in nupkg. -->
     <!-- As I'm not producing a separate symbol package (*.snupkg), I want portable PDBs to be included. -->
@@ -32,4 +33,9 @@
   <ItemGroup>
     <GlobalPackageReference Include="PolySharp" Version="1.15.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>
