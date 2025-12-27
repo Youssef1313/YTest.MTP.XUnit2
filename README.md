@@ -26,8 +26,6 @@ There are known limitations on the current support of MTP for xunit 2 which is p
 
 - testconfig.json isn't supported. It can be supported in the future similar to https://github.com/xunit/xunit/commit/4c1c66f09e19299b3496fe962a2cb005ba57bc9d.
     - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/1
-- `TestMethodIdentifierProperty` for parameters that represent generic types might not work well.
-    - Tracking issue: https://github.com/Youssef1313/YTest.MTP.XUnit2/issues/5
 
 ## How to use
 
