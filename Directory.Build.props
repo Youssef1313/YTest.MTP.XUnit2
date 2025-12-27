@@ -20,7 +20,7 @@
 
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
 
-    <Version>1.0.0-beta.3</Version>
+    <Version>1.0.0-beta.4</Version>
     <Authors>Youssef1313</Authors>
     <PackageTags>xunit MTP Test Testing dotnet xunit2 Microsoft.Testing.Platform</PackageTags>
     <Description>
