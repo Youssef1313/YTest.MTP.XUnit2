@@ -1,4 +1,4 @@
-s# YTest.MTP.XUnit2
+# YTest.MTP.XUnit2
 
 This package provides Microsoft.Testing.Platform support for xunit 2 test projects.
 
