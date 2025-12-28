@@ -15,12 +15,9 @@ internal sealed class BannerMessageOwnerCapability : IBannerMessageOwnerCapabili
         Task.FromResult<string?>(string.Format(
             CultureInfo.CurrentCulture,
             "YTest.MTP.XUnit2 Runner version {0} ({1}-bit {2}) {3}",
-            GetAssemblyVersion(typeof(BannerMessageOwnerCapability).Assembly),
+            XUnit2MTPExtension.Instance.Version,
             IntPtr.Size * 8,
             RuntimeInformation.FrameworkDescription,
             Environment.NewLine
         ));
-
-    private static string GetAssemblyVersion(Assembly assembly)
-        => assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "<unknown>";
 }
