@@ -113,7 +113,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
         RunSettings runSettings = RunSettings.Parse(runSettingsXml);
 
-        await (context.Request switch 
+        await (context.Request switch
         {
             DiscoverTestExecutionRequest discoverRequest => DiscoverTestsAsync(discoverRequest, context, assemblyPath, filter, runSettings),
             RunTestExecutionRequest runRequest => RunTestsAsync(runRequest, context, assemblyPath, filter, runSettings),
@@ -171,7 +171,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
                 typeName: typeFQNWithoutNamespace,
                 methodName: test.TestMethod.Method.Name,
                 methodArity: test.TestMethod.Method.GetGenericArguments().Count(),
-                parameterTypeFullNames: [..parameters],
+                parameterTypeFullNames: [.. parameters],
                 returnTypeFullName: test.TestMethod.Method.ReturnType.Name));
 
             if (!string.IsNullOrEmpty(test.SourceInformation.FileName))
@@ -272,7 +272,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             null or NopFilter => true,
             TreeNodeFilter treeNodeFilter => treeNodeFilter.MatchesFilter(CreateNodePath(test), CreateFilterablePropertyBag(test)),
 #pragma warning restore TPEXP // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
+            TestNodeUidListFilter testNodeUidListFilter => testNodeUidListFilter.TestNodeUids.Contains(new TestNodeUid(test.UniqueID)),
             _ => throw new NotSupportedException($"Filter type '{mtpFilter.GetType().FullName}' is not supported by XUnit2 MTP adapter."),
         };
 

@@ -45,7 +45,7 @@ internal sealed class CecilSourceInformationProvider : ISourceInformationProvide
         catch { }
     }
 
-    void AddAssembly(string assemblyFileName)
+    private void AddAssembly(string assemblyFileName)
     {
         try
         {
@@ -78,7 +78,7 @@ internal sealed class CecilSourceInformationProvider : ISourceInformationProvide
         catch { }
     }
 
-    void AddAssembly(Assembly assembly)
+    private void AddAssembly(Assembly assembly)
     {
         if (!assembly.IsDynamic)
             AddAssembly(assembly.Location);
@@ -152,7 +152,7 @@ internal sealed class CecilSourceInformationProvider : ISourceInformationProvide
         return EfficientNullSourceInformationProvider.NullSourceInformation;
     }
 
-    void OnAssemblyLoad(
+    private void OnAssemblyLoad(
         object? sender,
         AssemblyLoadEventArgs args) =>
             AddAssembly(args.LoadedAssembly);
@@ -185,7 +185,7 @@ internal sealed class CecilSourceInformationProvider : ISourceInformationProvide
         }
 
         public static ISourceInformation NullSourceInformation { get; } = new SourceInformation();
-        
+
         public static ISourceInformationProvider Instance { get; } = new EfficientNullSourceInformationProvider();
 
         public ISourceInformation GetSourceInformation(ITestCase testCase)

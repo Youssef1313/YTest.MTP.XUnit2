@@ -1,0 +1,241 @@
+# IDE0003 and IDE0009: this and Me preferences (option defaults are already false)
+dotnet_style_qualification_for_field = false
+dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_event = false
+dotnet_diagnostic.IDE0003.severity = warning
+
+# IDE0005: Remove unnecessary imports
+dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0011: Add braces
+dotnet_diagnostic.IDE0011.severity = none
+
+# IDE0016: Use throw expression
+dotnet_diagnostic.IDE0016.severity = warning
+
+# IDE0017: Use object initializers
+dotnet_style_object_initializer = true
+dotnet_diagnostic.IDE0017.severity = warning
+
+# IDE0018: Inline variable declaration
+dotnet_diagnostic.IDE0018.severity = warning
+
+# IDE0020 and IDE0038: Use pattern matching to avoid is check followed by a cast
+csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_pattern_matching_over_as_with_null_check = true
+dotnet_diagnostic.IDE0020.severity = warning
+dotnet_diagnostic.IDE0038.severity = warning
+
+# IDE0022: Use expression body for methods
+csharp_style_expression_bodied_methods = true
+csharp_style_expression_bodied_constructors = true
+csharp_style_expression_bodied_operators = true
+csharp_style_expression_bodied_properties = true
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_accessors = true
+csharp_style_expression_bodied_lambdas = true
+csharp_style_expression_bodied_local_functions = true
+dotnet_diagnostic.IDE0022.severity = warning
+
+# IDE0028: Use collection initializers or expressions
+# IDE0300: Use collection expression for array
+# IDE0301: Use collection expression for empty
+# IDE0302: Use collection expression for stackalloc
+# IDE0303: Use collection expression for Create()
+# IDE0304: Use collection expression for builder
+# IDE0305: Use collection expression for fluent
+# IDE0306: Use collection expression for new
+dotnet_style_collection_initializer = true
+dotnet_style_prefer_collection_expression = when_types_exactly_match
+dotnet_diagnostic.IDE0028.severity = none
+dotnet_diagnostic.IDE0300.severity = none
+dotnet_diagnostic.IDE0301.severity = none
+dotnet_diagnostic.IDE0302.severity = none
+dotnet_diagnostic.IDE0303.severity = none
+dotnet_diagnostic.IDE0304.severity = none
+dotnet_diagnostic.IDE0305.severity = none
+dotnet_diagnostic.IDE0306.severity = none
+
+# IDE0029: Null check can be simplified (ternary conditional check)
+# IDE0030: Null check can be simplified (nullable ternary conditional check)
+# IDE0270: Null check can be simplified (if null check)
+dotnet_style_coalesce_expression = true
+dotnet_diagnostic.IDE0029.severity = warning
+dotnet_diagnostic.IDE0030.severity = warning
+dotnet_diagnostic.IDE0270.severity = warning
+
+# IDE0031: Use null propagation
+dotnet_style_null_propagation = true
+dotnet_diagnostic.IDE0031.severity = warning
+
+# IDE0032: Use auto-implemented property
+dotnet_style_prefer_auto_properties = true
+dotnet_diagnostic.IDE0032.severity = warning
+
+# IDE0033: Use explicitly provided tuple name
+dotnet_style_explicit_tuple_names = true
+dotnet_diagnostic.IDE0033.severity = warning
+
+# IDE0034: Simplify 'default' expression
+csharp_prefer_simple_default_expression = true
+dotnet_diagnostic.IDE0034.severity = warning
+
+# IDE0036: Order modifiers
+# IDE0040: Add accessibility modifiers
+csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async
+dotnet_diagnostic.IDE0036.severity = warning
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0037: Use inferred member names
+dotnet_style_prefer_inferred_tuple_names = true
+dotnet_style_prefer_inferred_anonymous_type_member_names = true
+dotnet_diagnostic.IDE0037.severity = warning
+
+# IDE0040: Add accessibility modifiers
+dotnet_style_require_accessibility_modifiers = for_non_interface_members
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0041: Use 'is null' check
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true
+dotnet_diagnostic.IDE0041.severity = warning
+
+# IDE0044: Add readonly modifier
+dotnet_style_readonly_field = true
+dotnet_diagnostic.IDE0044.severity = warning
+
+# IDE0045: Use conditional expression for assignment
+dotnet_style_prefer_conditional_expression_over_assignment = true
+dotnet_diagnostic.IDE0045.severity = none
+
+# IDE0046: Use conditional expression for return
+dotnet_style_prefer_conditional_expression_over_return = true
+dotnet_diagnostic.IDE0046.severity = none
+
+# IDE0049: Use language keywords instead of framework type names for type references
+# Default is already true. This rule is not enabled on build.
+dotnet_style_predefined_type_for_locals_parameters_members = true
+dotnet_style_predefined_type_for_member_access = true
+dotnet_diagnostic.IDE0049.severity = warning
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = warning
+
+# .NET formatting options - IDE0055
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# New line preferences - IDE0055
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# Indentation preferences - IDE0055
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = false
+csharp_indent_switch_labels = true
+csharp_indent_labels = one_less_than_current
+
+# Spacing preferences - IDE0055
+csharp_space_after_cast = false
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_after_comma  = true
+csharp_space_after_dot = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_around_declaration_statements = do_not_ignore
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+csharp_space_before_open_square_brackets = false
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_between_square_brackets = false
+
+# Wrapping preferences - IDE0055
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = false
+
+# IDE0056: Use index operator
+csharp_style_prefer_index_operator = false
+dotnet_diagnostic.IDE0056.severity = warning
+
+# IDE0057: Use range operator
+csharp_style_prefer_range_operator = false
+dotnet_diagnostic.IDE0057.severity = warning
+
+# IDE0062: Make local function static
+csharp_prefer_static_local_function = true
+dotnet_diagnostic.IDE0062.severity = warning
+
+# IDE0063: Use simple 'using' statement
+csharp_prefer_simple_using_statement = true
+dotnet_diagnostic.IDE0063.severity = warning
+
+# IDE0066: Use switch expression
+csharp_style_prefer_switch_expression = true
+dotnet_diagnostic.IDE0066.severity = warning
+
+# IDE1006: Naming rule violation
+dotnet_diagnostic.IDE1006.severity = warning
+
+# Naming rules: name all constant fields using PascalCase (IDE1006)
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols  = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style    = pascal_case_style
+dotnet_naming_symbols.constant_fields.applicable_kinds   = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# Naming rules: static fields should have s_ prefix (IDE1006)
+dotnet_naming_rule.static_fields_should_have_prefix.severity = suggestion
+dotnet_naming_rule.static_fields_should_have_prefix.symbols  = static_fields
+dotnet_naming_rule.static_fields_should_have_prefix.style    = static_prefix_style
+dotnet_naming_symbols.static_fields.applicable_kinds   = field
+dotnet_naming_symbols.static_fields.required_modifiers = static
+dotnet_naming_symbols.static_fields.applicable_accessibilities = private, internal, private_protected
+dotnet_naming_style.static_prefix_style.required_prefix = s_
+dotnet_naming_style.static_prefix_style.capitalization = camel_case
+
+# Naming rules: internal and private fields should be _camelCase (IDE1006)
+dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style    = camel_case_underscore_style
+dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+
+# IDE1005
+csharp_style_conditional_delegate_call = true
+
+
+# IDE0160 and IDE0161
+csharp_style_namespace_declarations = file_scoped
+
+
+# CA1014: Mark assemblies with CLSCompliant
+dotnet_diagnostic.CA1014.severity = none
+
+# CA1824: Mark assemblies with NeutralResourcesLanguageAttribute
+dotnet_diagnostic.CA1824.severity = none
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+
+# TODO: Use YAnalyzers for var vs explicit types.

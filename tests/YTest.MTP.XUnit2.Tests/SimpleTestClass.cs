@@ -11,7 +11,5 @@ public class SimpleTestClass
 
     [Fact(Skip = "Skipped becase...")]
     public void SkippedTet()
-    {
-        Assert.Fail("Failing test...");
-    }
+        => Assert.Fail("Failing test...");
 }

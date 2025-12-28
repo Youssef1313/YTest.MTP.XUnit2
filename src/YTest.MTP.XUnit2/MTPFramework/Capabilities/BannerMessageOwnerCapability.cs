@@ -22,5 +22,5 @@ internal sealed class BannerMessageOwnerCapability : IBannerMessageOwnerCapabili
         ));
 
     private static string GetAssemblyVersion(Assembly assembly)
-        => ((AssemblyInformationalVersionAttribute?)assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute)))?.InformationalVersion ?? "<unknown>";    
+        => ((AssemblyInformationalVersionAttribute?)assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute)))?.InformationalVersion ?? "<unknown>";
 }
