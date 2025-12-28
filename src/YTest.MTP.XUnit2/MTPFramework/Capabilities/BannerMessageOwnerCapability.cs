@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
