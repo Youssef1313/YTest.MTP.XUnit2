@@ -25,9 +25,7 @@
     <Version>1.0.0-beta.4</Version>
     <Authors>Youssef1313</Authors>
     <PackageTags>xunit MTP Test Testing dotnet xunit2 Microsoft.Testing.Platform</PackageTags>
-    <Description>
-      This package provides MTP support for xunit 2.
-    </Description>
+    <Description>This package provides MTP support for xunit 2.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
