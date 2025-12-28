@@ -19,7 +19,7 @@ internal sealed class XUnit2MTPCommandLineProvider : ICommandLineOptionsProvider
 
     public string Uid => nameof(XUnit2MTPCommandLineProvider);
 
-    public string Version => "1.0.0";
+    public string Version => XUnit2MTPExtension.Instance.Version;
 
     public string DisplayName => "XUnit2 MTP Command Line Provider";
 
