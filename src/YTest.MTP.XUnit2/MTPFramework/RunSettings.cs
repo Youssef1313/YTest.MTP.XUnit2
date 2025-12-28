@@ -7,7 +7,7 @@ using Xunit;
 namespace YTest.MTP.XUnit2;
 
 // TODO: Look into NoAutoReporters and ReporterSwitch to see if they can be supported.
-internal class RunSettings
+internal sealed class RunSettings
 {
     public AppDomainSupport? AppDomain { get; set; }
     // public int? AssertEquivalentMaxDepth { get; set; }

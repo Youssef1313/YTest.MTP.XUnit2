@@ -6,7 +6,7 @@ using Microsoft.Testing.Platform.Extensions.CommandLine;
 
 namespace YTest.MTP.XUnit2;
 
-internal class XUnit2MTPCommandLineProvider : ICommandLineOptionsProvider
+internal sealed class XUnit2MTPCommandLineProvider : ICommandLineOptionsProvider
 {
     public const string FilterOptionName = "filter";
     public const string SettingsOptionName = "settings";

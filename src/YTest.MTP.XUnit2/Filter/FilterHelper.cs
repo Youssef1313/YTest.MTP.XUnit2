@@ -16,37 +16,6 @@ internal static class FilterHelper
     private static readonly HashSet<char> s_specialCharactersSet = new(s_specialCharacters);
 
     /// <summary>
-    /// Escapes a set of special characters for filter (%, (, ), &amp;, |, =, !, ~) by replacing them with their escape sequences.
-    /// </summary>
-    /// <param name="str">The input string that contains the text to convert.</param>
-    /// <returns>A string of characters with special characters converted to their escaped form.</returns>
-    public static string Escape(string str)
-    {
-        if (str is null)
-        {
-            throw new ArgumentNullException(nameof(str));
-        }
-
-        if (str.IndexOfAny(s_specialCharacters) < 0)
-        {
-            return str;
-        }
-
-        var builder = new StringBuilder();
-        for (int i = 0; i < str.Length; ++i)
-        {
-            var currentChar = str[i];
-            if (s_specialCharactersSet.Contains(currentChar))
-            {
-                builder.Append(EscapeCharacter);
-            }
-            builder.Append(currentChar);
-        }
-
-        return builder.ToString();
-    }
-
-    /// <summary>
     /// Converts any escaped characters in the input filter string.
     /// </summary>
     /// <param name="str">The input string that contains the text to convert.</param>
