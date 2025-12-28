@@ -203,9 +203,9 @@ dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
 # Naming rules: static fields should have s_ prefix (IDE1006)
 dotnet_naming_rule.static_fields_should_have_prefix.severity = suggestion
-dotnet_naming_rule.static_fields_should_have_prefix.symbols  = static_fields
-dotnet_naming_rule.static_fields_should_have_prefix.style    = static_prefix_style
-dotnet_naming_symbols.static_fields.applicable_kinds   = field
+dotnet_naming_rule.static_fields_should_have_prefix.symbols = static_fields
+dotnet_naming_rule.static_fields_should_have_prefix.style = static_prefix_style
+dotnet_naming_symbols.static_fields.applicable_kinds = field
 dotnet_naming_symbols.static_fields.required_modifiers = static
 dotnet_naming_symbols.static_fields.applicable_accessibilities = private, internal, private_protected
 dotnet_naming_style.static_prefix_style.required_prefix = s_
@@ -213,20 +213,22 @@ dotnet_naming_style.static_prefix_style.capitalization = camel_case
 
 # Naming rules: internal and private fields should be _camelCase (IDE1006)
 dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
-dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
-dotnet_naming_rule.camel_case_for_private_internal_fields.style    = camel_case_underscore_style
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style = camel_case_underscore_style
 dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
 dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
 dotnet_naming_style.camel_case_underscore_style.required_prefix = _
 dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
 
-# IDE1005
+# IDE1005: Use conditional delegate call
 csharp_style_conditional_delegate_call = true
+dotnet_diagnostic.IDE1005.severity = warning
 
-
-# IDE0160 and IDE0161
+# IDE0160: Use block-scoped namespace
+# IDE0161: Use file-scoped namespace
 csharp_style_namespace_declarations = file_scoped
-
+dotnet_diagnostic.IDE0160.severity = warning
+dotnet_diagnostic.IDE0161.severity = warning
 
 # CA1014: Mark assemblies with CLSCompliant
 dotnet_diagnostic.CA1014.severity = none
