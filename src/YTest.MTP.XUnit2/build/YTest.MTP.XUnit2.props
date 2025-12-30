@@ -5,6 +5,7 @@
     <_SupportsGlobalJsonTestRunner Condition="'$(NETCoreSdkVersion)' != '' AND '$(_SdkMajorVersion)' >= '10'">true</_SupportsGlobalJsonTestRunner>
     <TestingPlatformDotnetTestSupport Condition="'$(TestingPlatformDotnetTestSupport)' == '' AND '$(_SupportsGlobalJsonTestRunner)' != 'true'">true</TestingPlatformDotnetTestSupport>
     <TestingPlatformCaptureOutput Condition="'$(TestingPlatformCaptureOutput)' == '' AND '$(_SupportsGlobalJsonTestRunner)' != 'true'">false</TestingPlatformCaptureOutput>
+    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
   <ItemGroup>
