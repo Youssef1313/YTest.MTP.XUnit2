@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- The package isn't expected to be referenced by a project that targets netstandard2.0 -->
-    <!-- The netstandard2.0 is added only for compatibility with older TFMs that are EOL (< net8.0) -->
-    <TargetFrameworks>net462;net8.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0;net5.0;net461</TargetFrameworks>
 
     <!-- This project itself is not a test project. -->
     <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
+
+    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'net5.0'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
