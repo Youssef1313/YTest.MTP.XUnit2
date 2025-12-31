@@ -220,7 +220,7 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
             testFrameworkOptions.SetDisableParallelization(true);
         }
 
-        frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)), executionSink, testFrameworkOptions);
+        frontController.RunTests(testCases.Where(tc => MatchesFilter(runRequest.Filter, filter, tc)).ToArray(), executionSink, testFrameworkOptions);
 
         await Task.Factory.StartNew(executionSink.Finished.WaitOne, TaskCreationOptions.LongRunning);
     }
