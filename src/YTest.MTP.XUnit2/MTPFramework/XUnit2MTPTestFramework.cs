@@ -76,14 +76,6 @@ internal sealed class XUnit2MTPTestFramework : Microsoft.Testing.Platform.Extens
 
         var assemblyPath = assembly.Location;
 
-#if !NETFRAMEWORK
-        if (OperatingSystem.IsWindows())
-#endif
-        {
-            // Change .exe to .dll
-            assemblyPath = Path.ChangeExtension(assemblyPath, "dll");
-        }
-
         if (!File.Exists(assemblyPath))
         {
             throw new FileNotFoundException("XUnit2 MTP adapter cannot find the test assembly.", assemblyPath);
