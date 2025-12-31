@@ -12,4 +12,5 @@
     <PackageReference Include="xunit" />
   </ItemGroup>
 
+  <Import Project="..\..\src\YTest.MTP.XUnit2\build\YTest.MTP.XUnit2.targets" />
 </Project>
