@@ -22,7 +22,7 @@
 
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
 
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Youssef1313</Authors>
     <PackageTags>xunit MTP Test Testing dotnet xunit2 Microsoft.Testing.Platform</PackageTags>
     <Description>This package provides MTP support for xunit 2.</Description>
