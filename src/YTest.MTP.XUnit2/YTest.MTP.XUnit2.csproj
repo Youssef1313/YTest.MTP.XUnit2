@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net8.0;net5.0;net461</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
 
     <!-- This project itself is not a test project. -->
     <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
-
-    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'net5.0'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
