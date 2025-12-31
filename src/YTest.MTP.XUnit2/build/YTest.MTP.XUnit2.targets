@@ -1,0 +1,6 @@
+<Project InitialTargets="NETStandardCompatError_YTest_MTP_XUnit2">
+  <Target Name="NETStandardCompatError_YTest_MTP_XUnit2">
+        <Warning Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'"
+                 Text="YTest.MTP.XUnit2 is intended to be used by runnable test application, hence it does not support the target framework '$(TargetFramework)'. Test libraries (projects that don't directly run tests) should not reference YTest.MTP.XUnit2 NuGet package." />
+    </Target>
+</Project>
