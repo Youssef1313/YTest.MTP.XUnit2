@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0;net6.0</TargetFrameworks>
 
     <!-- This project itself is not a test project. -->
     <IsTestingPlatformApplication>false</IsTestingPlatformApplication>

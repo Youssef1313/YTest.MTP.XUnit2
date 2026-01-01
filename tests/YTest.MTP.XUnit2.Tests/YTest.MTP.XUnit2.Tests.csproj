@@ -3,9 +3,10 @@
   <Import Project="..\..\src\YTest.MTP.XUnit2\build\YTest.MTP.XUnit2.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net6.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net462</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'net6.0'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
